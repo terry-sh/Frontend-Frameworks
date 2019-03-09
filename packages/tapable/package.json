@@ -1,0 +1,15 @@
+{
+  "name": "learn-tapable",
+  "version": "1.0.0",
+  "description": "Tappable is a event-based hooks plugin library.",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Huang Jules",
+  "license": "ISC",
+  "dependencies": {
+    "tapable": "^1.1.1"
+  }
+}
