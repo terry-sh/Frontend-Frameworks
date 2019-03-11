@@ -29,3 +29,9 @@ try {
 } catch (error) {
   console.log(`Cat cries: "${error.message}", and lies down dead.`);
 }
+
+console.log();
+cat.tap("eat bone", fish => {
+  eat("bone", fish);
+});
+cat.call("catfish");
