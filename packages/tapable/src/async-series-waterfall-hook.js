@@ -24,6 +24,13 @@ for (let i = 1; i <= 4; i++) {
 }
 
 console.time("test");
-timer.callAsync(0, () => {
-  console.timeEnd("test"); // 5 seconds
+timer.callAsync(0, (name, args) => {
+  console.log(args);
+  console.timeEnd("test");
+});
+
+console.time("test2");
+timer.promise(0).then(args => {
+  console.log(args);
+  console.timeEnd("test2");
 });
