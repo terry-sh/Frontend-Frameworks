@@ -26,3 +26,5 @@ Keywords: `sync`/`async`(`parallel`/`series`), `bail`/`waterfall`/`loop`
 # `HookMap`
 
 # `MultiHook`
+
+可以同时对多个 hook 进行添加订阅、添加拦截器等操作（但不能同时发布事件）。
