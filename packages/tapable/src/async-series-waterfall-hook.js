@@ -4,24 +4,23 @@ const timer = new AsyncSeriesWaterfallHook(["args"]);
 
 for (let i = 1; i <= 4; i++) {
   const label = `timout ${i}`;
+  /*
   timer.tapPromise(label, args => {
     return new Promise(resolve => {
       setTimeout(() => {
-        console.log(label, args);
+        console.log(label, ', args =',args);
         resolve(i);
       }, 1000);
     });
   });
+  */
 
-  /// this will be wrong
-  /**
-  timer.tapAsync(label, (args, done) => {
+  timer.tapAsync(label, function (args, done) {
     setTimeout(() => {
-      console.log(label, args);
-      done(i);
+      console.log(label, ', args =', args);
+      done(null, i);
     }, 1000);
   });
-   */
 }
 
 console.time("test");
