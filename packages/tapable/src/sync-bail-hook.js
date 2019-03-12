@@ -41,7 +41,7 @@ Nations.forEach(nation => {
     if (sayNo) {
       if (sayNo.indexOf(event) >= 0) {
         console.log(name, "is unhappy.");
-        return "veto";
+        return true;
       } else {
         console.log(name, "votes for", event, "in affirmative happily.");
       }
