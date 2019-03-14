@@ -1,11 +1,12 @@
 # Tapable
 
-Tappable is a event-based hooks plugin library.
+Tapable is a event-based hooks plugin library.
 
 - event stream
+
 - publish/subscriber design pattern
 
-## hooks
+## Hooks
 
 Keywords: `sync`/`async`(`parallel`/`series`), `bail`/`waterfall`/`loop`
 
@@ -23,8 +24,21 @@ Keywords: `sync`/`async`(`parallel`/`series`), `bail`/`waterfall`/`loop`
       - `AsyncSeriesBailHook`
       - `AsyncSeriesWaterfallHook`
 
-# `HookMap`
+## `HookMap`
 
-# `MultiHook`
+Map 与 Hook 的结合。
+
+```ts
+class HookMap {
+  for(key: string): Hook;
+  get(key: string): Hook|undefined;
+  intercept(interceptor: HookmapInterceptor): void;
+
+  /** @deprecate */
+  tap(key: string, nameOrConfig, subscriber): void;
+}
+```
+
+## `MultiHook`
 
 可以同时对多个 hook 进行添加订阅、添加拦截器等操作（但不能同时发布事件）。
