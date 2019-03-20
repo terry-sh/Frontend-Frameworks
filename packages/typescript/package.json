@@ -1,0 +1,16 @@
+{
+  "name": "typescript-learning",
+  "version": "1.0.0",
+  "description": "Typescript learning notes",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc src/main.ts && tsc src/lib/transformer.ts && node src/main.js",
+    "test-lib": "tsc src/lib/transformer.ts && node src/main.js"
+  },
+  "author": "Huang Jules",
+  "devDependencies": {
+    "@types/node": "^11.11.4",
+    "typescript": "^3.3.4000"
+  }
+}
