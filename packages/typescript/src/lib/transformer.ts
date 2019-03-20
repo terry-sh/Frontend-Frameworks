@@ -1,8 +1,10 @@
 import * as ts from "typescript";
 import * as path from "path";
 
+/** Name of dispatch function interface */
 const DispatchName = "Dispatch";
-
+/** Name of action field "type"  */
+const TypeName = "type";
 /** Type declration file name */
 const TypeDeclarationFile = "index.ts";
 
@@ -28,9 +30,9 @@ function isDispatchCallExpression(
     if (signature !== undefined) {
       const { declaration } = signature;
       if (!!declaration) {
-        if (ts.isCallSignatureDeclaration(declaration)) {
+        if (ts.isCallSignatureDeclaration(declaration)) {          
           if (ts.isInterfaceDeclaration(declaration.parent)) {
-            const isDispatch = declaration.parent.name.getText() === "Dispatch";
+            const isDispatch = declaration.parent.name.getText() === DispatchName;
             if (isDispatch) {
               return path.join(declaration.getSourceFile().fileName) === indexTs;
             }
@@ -84,12 +86,18 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   if (node.arguments.length > 0) {
     const payload = node.arguments[0];
     if (ts.isObjectLiteralExpression(payload)) {
+
       payload.properties = ts.createNodeArray(
         payload.properties.map(val => {
-          if (ts.isPropertyAssignment(val) && val.name.getText() === DispatchName) {
+          if (ts.isPropertyAssignment(val) && val.name.getText() === TypeName) {
             const { initializer } = val;
             if (ts.isPropertyAccessExpression(initializer)) {
-              val.initializer = ts.createStringLiteral(initializer.getText());
+              // TODO: do action type transformation
+              const typePath = initializer.getText().split('.');
+              const actionType = typePath[0] + '/' + typePath[2];
+
+              const newInitializer = ts.createStringLiteral(actionType);
+              val.initializer = newInitializer;
             }
           }
           return val;
