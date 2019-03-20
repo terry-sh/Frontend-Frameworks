@@ -4,4 +4,12 @@ const dispatch: Dispatch = function(action: any) {
   return action;
 };
 
-dispatch({ type: 'a', payload: 1});
+const UserStore = {
+  namespace: 'user',
+  state: {},
+  reducers: {
+    update() {}
+  }
+}
+
+dispatch({ type: UserStore.reducers.update, payload: 1});

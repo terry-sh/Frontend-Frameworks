@@ -33,6 +33,21 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   if (!isDispatchCallExpression(node, typeChecker)) {
     return node;
   }
+
+  if (node.arguments.length > 0) {
+    const payload = node.arguments[0];
+    if (ts.isObjectLiteralExpression(payload)) {
+      payload.properties = ts.createNodeArray(payload.properties.map(val => {
+        if (ts.isPropertyAssignment(val) && val.name.getText() === "type") {
+          const { initializer } = val;
+          if (ts.isPropertyAccessExpression(initializer)) {
+            val.initializer = ts.createStringLiteral(initializer.getText());
+          }
+        }
+        return val;
+      }));
+    }
+  }
   return node;
 }
 
