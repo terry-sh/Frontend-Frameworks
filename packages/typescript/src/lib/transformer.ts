@@ -2,9 +2,12 @@ import * as ts from "typescript";
 import * as path from "path";
 
 /** Name of dispatch function interface */
-const DispatchName = "Dispatch";
+const DispatchInterfaceName = "Dispatch";
 /** Name of action field "type"  */
-const TypeName = "type";
+const TypeKeyName = "type";
+/** Name of namespace field "namespace" */
+const NamespaceKeyName = "namespace";
+
 /** Type declration file name */
 const TypeDeclarationFile = "index.ts";
 
@@ -13,11 +16,11 @@ const indexTs = path.join(__dirname, TypeDeclarationFile);
 
 /**
  * Whether the current node is a "dispatch" call, i.e.
- * 
+ *
  * ```ts
- * dispatch({ type: 'user/fetchUser', payload; { userId: 1 } })
+ * dispatch({ type: 'user/fetchUser', payload: { userId: 1 } })
  * ```
- * 
+ *
  * @param node
  * @param typeChecker
  */
@@ -32,7 +35,7 @@ function isDispatchCallExpression(
       if (!!declaration) {
         if (ts.isCallSignatureDeclaration(declaration)) {
           if (ts.isInterfaceDeclaration(declaration.parent)) {
-            const isDispatch = declaration.parent.name.getText() === DispatchName;
+            const isDispatch = declaration.parent.name.getText() === DispatchInterfaceName;
             if (isDispatch) {
               return path.join(declaration.getSourceFile().fileName) === indexTs;
             }
@@ -45,10 +48,81 @@ function isDispatchCallExpression(
 }
 
 /**
+ * Get reducer name from action type value
+ * @param initializer the node passed to function is like
+ *        `UserStore.effects.fetchUser` of { name: initializer }
+ * @param typeChecker
+ */
+function getReducerName(initializer: ts.Expression, typeChecker: ts.TypeChecker) {
+  let reducerName: string = undefined;
+  if (ts.isPropertyAccessExpression(initializer)) {
+    // The expression is like `User.effects.fetchUser`
+    reducerName = initializer.name.text;
+  } else if (ts.isElementAccessExpression(initializer)) {
+    // The expression is like `UserStore.effects['fetchUser']`
+    if (ts.isStringLiteral(initializer.argumentExpression)) {
+      reducerName = initializer.argumentExpression.text;
+    }
+  }
+  return reducerName;
+}
+
+/**
+ * Get namespace name from from action type value
+ * @param initializer the node passed to function is like
+ *        `UserStore.effects.fetchUser` of { name: initializer }
+ * @param typeChecker
+ */
+function getNamespaceName(initializer: ts.Expression, typeChecker: ts.TypeChecker) {
+  let namespaceName: string = undefined;
+
+  const reducerNode =
+    ts.isPropertyAccessExpression(initializer) || ts.isElementAccessExpression(initializer)
+      ? initializer.expression
+      : undefined;
+
+  const storeNode =
+    ts.isPropertyAccessExpression(reducerNode) || ts.isElementAccessExpression(reducerNode)
+      ? reducerNode.expression
+      : undefined;
+
+  if (storeNode !== undefined) {
+    const storeType = typeChecker.getTypeAtLocation(storeNode).symbol;
+    const namespaceField = storeType.members.get(NamespaceKeyName as ts.__String);
+    const namespaceValue = namespaceField.getDeclarations();
+
+    if (Array.isArray(namespaceValue) && namespaceValue.length > 0) {
+      const field = namespaceValue[0];
+      if (ts.isPropertyAssignment(field)) {
+        if (ts.isStringLiteral(field.initializer)) {
+          namespaceName = field.initializer.text;
+        } else {
+          // TODO: handle other conditions
+        }
+      }
+    }
+
+    if (namespaceName === undefined && ts.isIdentifier(storeNode)) {
+      // Namespace fallback to store module name if can not
+      // get `namespace` field from store module
+      namespaceName = storeNode.text;
+    }
+  } else {
+    console.log("storeNode is undefined");
+  }
+
+  if (namespaceName === undefined) {
+    console.error("Can not resolve dispatch namespace");
+  }
+
+  return namespaceName;
+}
+
+/**
  * Recursive node visitor of Typescript compiler
- * @param node 
- * @param program 
- * @param context 
+ * @param node
+ * @param program
+ * @param context
  */
 function visitNodeAndChildren(
   node: ts.SourceFile,
@@ -74,8 +148,8 @@ function visitNodeAndChildren(
 
 /**
  * Node visitor of Typescript compiler
- * @param node 
- * @param program 
+ * @param node
+ * @param program
  */
 function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   const typeChecker = program.getTypeChecker();
@@ -86,58 +160,19 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   if (node.arguments.length > 0) {
     const payload = node.arguments[0];
     if (ts.isObjectLiteralExpression(payload)) {
-
       payload.properties = ts.createNodeArray(
         payload.properties.map(val => {
-          if (ts.isPropertyAssignment(val) && val.name.getText() === TypeName) {
-            const { initializer } = val;
-            if (ts.isPropertyAccessExpression(initializer)) {
-              // TODO: do action type transformation
-              const reducerName = initializer.name.text;
-              let namespaceName: string = undefined;
+          if (val.name.getText() === TypeKeyName) {
+            if (ts.isPropertyAssignment(val)) {
+              const reducerName = getReducerName(val.initializer, typeChecker);
+              const namespaceName = getNamespaceName(val.initializer, typeChecker);
 
-              const { expression: reducerOrEffects } = initializer;
-              if (ts.isPropertyAccessExpression(reducerOrEffects)) {
-                const storeNode = reducerOrEffects.expression;
-                const storeType = typeChecker.getTypeAtLocation(storeNode);
-                const namespaceField = storeType.symbol.members.get('namespace' as ts.__String);
-                const namespaceValue = namespaceField.getDeclarations();
-
-                if (Array.isArray(namespaceValue) && namespaceValue.length > 0) {
-                  const field = namespaceValue[0];
-                  if (ts.isPropertyAssignment(field)) {
-                    if (ts.isStringLiteral(field.initializer)) {
-                      namespaceName = field.initializer.text;
-                    } else {
-                      //
-                    }
-                  }
-                }
-
-                if (namespaceName === undefined && ts.isIdentifier(storeNode)) {
-                  // Namespace fallback to store module name if can not 
-                  // get `namespace` field from store module
-                  namespaceName = storeNode.text;
-                }
+              if (!!reducerName && !!namespaceName) {
+                val.initializer = ts.createStringLiteral(reducerName + '/' + namespaceName)
               }
-
-              if (namespaceName === undefined) {
-                console.error('Can not resolve dispatch namespace');
-              }
-  
-              const actionType = namespaceName + '/' + reducerName;
-              const newInitializer = ts.createStringLiteral(actionType);
-              val.initializer = newInitializer;
-            } else if (ts.isElementAccessExpression(initializer)) {
-              // if the expression is like:
-              // UserStore.reducers['fetchUser'];
-              if (ts.isStringLiteral(initializer.argumentExpression)) {
-                const reducerName = initializer.argumentExpression.getText();
-              }
-            } else {
-              // TODO:
             }
           }
+
           return val;
         })
       );
