@@ -30,7 +30,7 @@ function isDispatchCallExpression(
     if (signature !== undefined) {
       const { declaration } = signature;
       if (!!declaration) {
-        if (ts.isCallSignatureDeclaration(declaration)) {          
+        if (ts.isCallSignatureDeclaration(declaration)) {
           if (ts.isInterfaceDeclaration(declaration.parent)) {
             const isDispatch = declaration.parent.name.getText() === DispatchName;
             if (isDispatch) {
@@ -93,11 +93,49 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
             const { initializer } = val;
             if (ts.isPropertyAccessExpression(initializer)) {
               // TODO: do action type transformation
-              const typePath = initializer.getText().split('.');
-              const actionType = typePath[0] + '/' + typePath[2];
+              const reducerName = initializer.name.text;
+              let namespaceName: string = undefined;
 
+              const { expression: reducerOrEffects } = initializer;
+              if (ts.isPropertyAccessExpression(reducerOrEffects)) {
+                const storeNode = reducerOrEffects.expression;
+                const storeType = typeChecker.getTypeAtLocation(storeNode);
+                const namespaceField = storeType.symbol.members.get('namespace' as ts.__String);
+                const namespaceValue = namespaceField.getDeclarations();
+
+                if (Array.isArray(namespaceValue) && namespaceValue.length > 0) {
+                  const field = namespaceValue[0];
+                  if (ts.isPropertyAssignment(field)) {
+                    if (ts.isStringLiteral(field.initializer)) {
+                      namespaceName = field.initializer.text;
+                    } else {
+                      //
+                    }
+                  }
+                }
+
+                if (namespaceName === undefined && ts.isIdentifier(storeNode)) {
+                  // Namespace fallback to store module name if can not 
+                  // get `namespace` field from store module
+                  namespaceName = storeNode.text;
+                }
+              }
+
+              if (namespaceName === undefined) {
+                console.error('Can not resolve dispatch namespace');
+              }
+  
+              const actionType = namespaceName + '/' + reducerName;
               const newInitializer = ts.createStringLiteral(actionType);
               val.initializer = newInitializer;
+            } else if (ts.isElementAccessExpression(initializer)) {
+              // if the expression is like:
+              // UserStore.reducers['fetchUser'];
+              if (ts.isStringLiteral(initializer.argumentExpression)) {
+                const reducerName = initializer.argumentExpression.getText();
+              }
+            } else {
+              // TODO:
             }
           }
           return val;

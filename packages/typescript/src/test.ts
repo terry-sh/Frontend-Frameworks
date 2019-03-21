@@ -5,7 +5,7 @@ const dispatch: Dispatch = function(action: any) {
 };
 
 const UserStore = {
-  namespace: 'user',
+  namespace: 'auth.user',
   state: {},
   reducers: {
     update() {}
@@ -13,3 +13,4 @@ const UserStore = {
 }
 
 dispatch({ type: UserStore.reducers.update, payload: 1});
+dispatch({ type: UserStore.reducers['update'], payload: 1});
