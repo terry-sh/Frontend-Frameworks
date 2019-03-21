@@ -1,16 +1,32 @@
-import { Dispatch } from './lib/index'
+import { Dispatch } from "./lib/index";
 
 const dispatch: Dispatch = function(action: any) {
   return action;
 };
 
 const UserStore = {
-  namespace: 'auth.user',
+  namespace: "user",
   state: {},
   reducers: {
     update() {}
   }
-}
+};
 
-dispatch({ type: UserStore.reducers.update, payload: 1});
-dispatch({ type: UserStore.reducers['update'], payload: 1});
+dispatch({ type: UserStore.reducers.update, payload: 1 });
+dispatch({ type: UserStore.reducers["update"], payload: 1 });
+
+const AuthStore = {
+  namespace: "sys.auth" as "sys.auth",
+  state: {},
+  reducers: {
+    update({ payload }) {}
+  },
+  effects: {
+    *doAuth() {
+      yield fetch("/api/auth");
+    }
+  }
+};
+
+dispatch({ type: AuthStore.reducers.update, payload: 'L19leK32aeR' });
+dispatch({ type: AuthStore.effects["doAuth"], payload: { userName: "admin", password: "1234" } });

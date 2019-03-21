@@ -33,14 +33,12 @@ function isDispatchCallExpression(
     if (signature !== undefined) {
       const { declaration } = signature;
       if (!!declaration) {
-        if (ts.isCallSignatureDeclaration(declaration)) {
-          if (ts.isInterfaceDeclaration(declaration.parent)) {
-            const isDispatch = declaration.parent.name.getText() === DispatchInterfaceName;
-            if (isDispatch) {
-              return path.join(declaration.getSourceFile().fileName) === indexTs;
-            }
-          }
-        }
+        return (
+          ts.isCallSignatureDeclaration(declaration) &&
+          ts.isInterfaceDeclaration(declaration.parent) &&
+          declaration.parent.name.getText() === DispatchInterfaceName &&
+          path.join(declaration.getSourceFile().fileName) === indexTs
+        );
       }
     }
   }
@@ -94,10 +92,17 @@ function getNamespaceName(initializer: ts.Expression, typeChecker: ts.TypeChecke
     if (Array.isArray(namespaceValue) && namespaceValue.length > 0) {
       const field = namespaceValue[0];
       if (ts.isPropertyAssignment(field)) {
-        if (ts.isStringLiteral(field.initializer)) {
-          namespaceName = field.initializer.text;
+        const valueNode = field.initializer;
+        if (ts.isStringLiteral(valueNode)) {
+          namespaceName = valueNode.text;
+        } else if (ts.isAsExpression(valueNode)) {
+          // namespace: 'user' as 'user'
+          if (ts.isStringLiteral(valueNode.expression)) {
+            namespaceName = valueNode.expression.text;
+          }
         } else {
           // TODO: handle other conditions
+          console.log('Namespace Value is kind of:', field.initializer.kind);
         }
       }
     }
@@ -166,9 +171,8 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
             if (ts.isPropertyAssignment(val)) {
               const reducerName = getReducerName(val.initializer, typeChecker);
               const namespaceName = getNamespaceName(val.initializer, typeChecker);
-
               if (!!reducerName && !!namespaceName) {
-                val.initializer = ts.createStringLiteral(reducerName + '/' + namespaceName)
+                val.initializer = ts.createStringLiteral(namespaceName + "/" + reducerName);
               }
             }
           }
