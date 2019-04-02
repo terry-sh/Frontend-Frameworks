@@ -1,27 +1,22 @@
 /// Token Analyzer example
-
+import * as fs from "fs";
 import * as ts from "typescript";
 
-const sourceCode = `#!/bin/sh
-const i: number = 1.2;
-const flag = 0b0011;
-const name = "jules";
+const sourceCode = fs.readFileSync("./sample.ts").toString();
 
-const cat: Cat = null;
+const tokenAnalyzer = ts.createScanner(
+  ts.ScriptTarget.Latest,
+  /** set skip trivia to `false` */
+  false
+);
 
-if (i > 0) {
-  console.log('"i" is positive.');
-}
-`;
-
-const tokenAnalyzer = ts.createScanner(ts.ScriptTarget.Latest, true);
 tokenAnalyzer.setText(sourceCode);
 tokenAnalyzer.setOnError((message: ts.DiagnosticMessage, length: number) => {
   console.error(message);
 });
 
 // TODO: test different target script version
-tokenAnalyzer.setScriptTarget(ts.ScriptTarget.ES5);
+tokenAnalyzer.setScriptTarget(ts.ScriptTarget.Latest);
 tokenAnalyzer.setLanguageVariant(ts.LanguageVariant.Standard); // standard or JSX
 
 const tokenList = [];
