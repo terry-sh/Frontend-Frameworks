@@ -1,0 +1,26 @@
+# JSON
+
+number = 
+  [ '-' ], 
+  ( '0' | (digit0_9, { digit }) ),
+  [ '.', digit, { digit } ],
+  [ ('e' | 'E'), ['+' | '-'], digit, { digit } ];
+
+string = 
+  '\"', 
+  { UNICODE_character - '\'' - '\\' - control_character | 
+    ( '\\', 
+      ('\"' | '\\' | '/' | 'b', 'f', 'n', 'r', 't' | 
+       ('u', 4 * hexdigit)
+      )
+    )
+  }, 
+  '\"';
+
+pair = string, ':', value;
+pairs = pair | (pair, ',', pairs);
+object = '{', [ pairs ], '}';
+
+value = string | number | object | array | 'true' | 'false' | 'null';
+
+array = '[', { value } ,']';
