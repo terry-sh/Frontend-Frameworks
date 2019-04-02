@@ -2,7 +2,8 @@
 
 import * as ts from "typescript";
 
-const sourceCode = `const i: number = 1.2;
+const sourceCode = `#!/bin/sh
+const i: number = 1.2;
 const flag = 0b0011;
 const name = "jules";
 
