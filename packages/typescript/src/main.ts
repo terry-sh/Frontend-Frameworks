@@ -7,6 +7,8 @@ function compile(filePaths: string[], writeFileCallback?: ts.WriteFileCallback) 
   const program = ts.createProgram({
     rootNames: filePaths,
     options: {
+      target: ts.ScriptTarget.ESNext,
+      sourceMap: true,
       noEmitOnError: true
     }
   });

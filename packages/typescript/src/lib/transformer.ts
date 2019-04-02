@@ -96,7 +96,14 @@ function getNamespaceName(initializer: ts.Expression, typeChecker: ts.TypeChecke
         if (ts.isStringLiteral(valueNode)) {
           namespaceName = valueNode.text;
         } else if (ts.isAsExpression(valueNode)) {
-          // namespace: 'user' as 'user'
+          // handle conditions like:
+          /**
+           * ```js
+           * {
+           *   namespace: 'user' as 'user'
+           * }
+           * ```
+           */
           if (ts.isStringLiteral(valueNode.expression)) {
             namespaceName = valueNode.expression.text;
           }
@@ -172,7 +179,12 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
               const reducerName = getReducerName(val.initializer, typeChecker);
               const namespaceName = getNamespaceName(val.initializer, typeChecker);
               if (!!reducerName && !!namespaceName) {
-                val.initializer = ts.createStringLiteral(namespaceName + "/" + reducerName);
+                const newInitializer = ts.createStringLiteral(namespaceName + "/" + reducerName);
+                const { pos, end } = val.initializer;
+                newInitializer.pos = pos;
+                newInitializer.end = end;
+
+                val.initializer = newInitializer;
               }
             }
           }
