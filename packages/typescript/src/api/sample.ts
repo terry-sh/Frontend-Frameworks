@@ -4,7 +4,7 @@ const i: number = 1.2;
 const flag = 0b0011;
 
 const lastName = "jules";
-const fullName = `${ lastName }`;
+// const fullName = `${ lastName }`;
 
 class Cat {}
 const cat: Cat = null;

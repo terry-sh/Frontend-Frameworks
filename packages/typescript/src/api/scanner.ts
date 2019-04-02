@@ -7,7 +7,7 @@ const sourceCode = fs.readFileSync("./sample.ts").toString();
 const tokenAnalyzer = ts.createScanner(
   ts.ScriptTarget.Latest,
   /** set skip trivia to `false` */
-  false
+  true
 );
 
 tokenAnalyzer.setText(sourceCode);
@@ -16,7 +16,7 @@ tokenAnalyzer.setOnError((message: ts.DiagnosticMessage, length: number) => {
 });
 
 // TODO: test different target script version
-tokenAnalyzer.setScriptTarget(ts.ScriptTarget.Latest);
+tokenAnalyzer.setScriptTarget(ts.ScriptTarget.ES5);
 tokenAnalyzer.setLanguageVariant(ts.LanguageVariant.Standard); // standard or JSX
 
 const tokenList = [];
@@ -46,4 +46,4 @@ while (true) {
 
   tokenList.push(info);
 }
-console.table(tokenList);
+// console.table(tokenList);

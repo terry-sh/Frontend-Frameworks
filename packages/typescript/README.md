@@ -9,6 +9,10 @@
   (lexical analysis) inputs text streams and outputs token streams.
 
   source code of `Scanner` is located in `/src/compiler/scanner.ts`.
+ 
+  **FAQ**
+
+  + `scan` method will incur `Unterminated_template_literal` errors when source file contains string template literal.
 
 - `Parser`
 
@@ -21,3 +25,4 @@
   (semantic analysis) generates Symbols (objects used by Typescript compiler).
 
 - `Checker`
+
