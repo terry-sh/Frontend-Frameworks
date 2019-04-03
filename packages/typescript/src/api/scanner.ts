@@ -1,8 +1,11 @@
 /// Token Analyzer example
 import * as fs from "fs";
+import * as path from "path";
 import * as ts from "typescript";
 
-const sourceCode = fs.readFileSync("./sample.ts").toString();
+const sourceFile = "sample.ts";
+const sourcePath = path.resolve(__dirname, sourceFile);
+const sourceCode = fs.readFileSync(sourcePath).toString();
 
 const tokenAnalyzer = ts.createScanner(
   ts.ScriptTarget.Latest,
@@ -46,4 +49,4 @@ while (true) {
 
   tokenList.push(info);
 }
-// console.table(tokenList);
+console.table(tokenList);
