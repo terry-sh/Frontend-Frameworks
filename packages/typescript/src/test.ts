@@ -4,20 +4,42 @@ const dispatch: Dispatch = function(action: any) {
   return action;
 };
 
+interface User {
+  id: number;
+  name: string;
+}
+
 const UserStore = {
   namespace: "user",
-  state: {},
+  state: {
+    users: []
+  },
   reducers: {
-    update() {}
+    update(state, { payload }: Action<User[]>) {
+      return { ...state, users: payload }
+    }
+  },
+  effects: {
+    *fetchData(_, { put, call }: { put: Dispatch, call: any }) {
+      try {
+        const { data } = yield call(fetch('/api/users'))
+        if (data) {
+          put({ type: UserStore.reducers.update, payload: data });
+        }
+      } catch (error) {
+        
+      }
+    }
   }
 };
 
-dispatch({ type: UserStore.reducers.update, payload: 1 });
-dispatch({ type: UserStore.reducers["update"], payload: 1 });
+dispatch({ type: UserStore.reducers.update, payload: [] });
+dispatch({ type: UserStore.reducers['update'], payload: [] });
 
 interface AutState {}
+
 const AuthStore = {
-  namespace: "sys.auth" as "sys.auth",
+  namespace: "sys.auth",
   state: {} as AutState,
   reducers: {
     update(state: AutState, { payload }: Action<string>) {}
