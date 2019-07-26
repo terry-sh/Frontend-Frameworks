@@ -2,6 +2,9 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "target": "es6",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "alwaysStrict": true,
+    "strict": true,
   }
 }
