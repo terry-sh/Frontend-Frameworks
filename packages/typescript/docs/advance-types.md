@@ -18,6 +18,14 @@ type NameType = ReturnType<typeof getName>; // string
 
 Currently it is impossible to do the trick for all cases.
 
+For more information, see:
+
+  - [Typescript ReturnType of generic function](https://stackoverflow.com/questions/50321419/typescript-returntype-of-generic-function)
+
+  - [TypeScript: Is it possible to get the return type of a generic function?](https://stackoverflow.com/questions/52963637/typescript-is-it-possible-to-get-the-return-type-of-a-generic-function)
+
+  - [https://github.com/Microsoft/TypeScript/issues/6606](https://github.com/Microsoft/TypeScript/issues/6606)
+
 ```ts
 function getSomething<T>(
   value: T
