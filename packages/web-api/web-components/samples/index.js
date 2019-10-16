@@ -1,9 +1,14 @@
 const sheet = new CSSStyleSheet();
-sheet.replaceSync(
-`:host { display: block; background-color: black; color: white; padding: 0.5em; }
-h1 { font-size: 1.4rem; }
-p { font-size: 1.2rem; }`
-);
+sheet.replaceSync(`:host {
+  --color-primary: black;
+  --color-secondary: gray;
+  --color-background: rgb(240,240,240);
+  display: block;
+  background-color: var(--color-background);
+  padding: 0.5em;
+}
+h1 { font-size: 1.4rem; color: var(--color-primary); }
+p { font-size: 1.1rem; color: var(--color-secondary); }`);
 
 window.customElements.define(
   "book-item",
@@ -25,10 +30,13 @@ window.customElements.define(
       shadow.appendChild(title);
       shadow.appendChild(content);
       shadow.adoptedStyleSheets = [sheet];
+      this.classList.add("book-item");
     }
   }
 );
 
 setTimeout(() => {
-  sheet.rules[0].styleMap.set("background-color", "firebrick");
+  sheet.rules[0].styleMap.set("--color-primary", "white");
+  sheet.rules[0].styleMap.set("--color-secondary", "rgb(240,240,240)");
+  sheet.rules[0].styleMap.set("--color-background", "firebrick");
 }, 2000);
