@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>on-error</title>
+</head>
+<body>
+	<button id="make-error">make error</button>
+	<button id="make-async-error">make async error</button>
+
+	<script type="text/javascript" src="./error-capture.js"></script>
+	<script type="text/javascript">
+		function make_error(event) {
+			event.stopPropagation();
+			throw new Error('sync error');
+		}
+		function make_async_error(event) {
+			event.stopPropagation();
+			setTimeout(() => {
+				return Promise.reject('async-error');
+			}, 2000);
+		}
+
+		const me = document.getElementById('make-error');
+		if (me) {
+			me.addEventListener('click', make_error);
+		}
+		const mae = document.getElementById('make-async-error');
+		if (mae) {
+			mae.addEventListener('click', make_async_error);
+		}
+	</script>
+</body>
+</html>
