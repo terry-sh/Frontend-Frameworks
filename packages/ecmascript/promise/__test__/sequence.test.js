@@ -43,27 +43,25 @@ describe("Sequence of Promise", () => {
   });
 
   test("Higher order promise", done => {
-    let count = 2;
-    const cb = () => {
-      if (--count === 0) {
-        expect(snd).toHaveBeenCalledAfter(fst);
-        done();
-      }
-    }
-    const fst = jest.fn(() => cb(1));
-    const snd = jest.fn(() => cb(2));
+    const first = jest.fn();
+    const second = jest.fn();
 
-    function log_seq(first, second) {
+    function log_seq(a, b) {
       // @warning
       // not
       // ```js
       // Promise.resolve(...)
       // ````
-      new Promise(resolve => { resolve(second); }).then(snd);
-      first.then(fst);
+      return [
+        new Promise(resolve => resolve(b)).then(second),
+        a.then(first),
+      ];
     }
 
-    log_seq(Promise.resolve("A"), Promise.resolve("B"));
+    Promise.all(log_seq(Promise.resolve("A"), Promise.resolve("B"))).then(() => {
+        expect(first).toHaveBeenCalledBefore(second);
+        done();
+    });
 
   });
 

@@ -6,17 +6,15 @@ describe('Once resolved, promises will be immutable.', () => {
 
   test('resolves once only', done => {
     const success = jest.fn();
-    const test_end = () => {
-      expect(success).toHaveBeenCalledTimes(1);
-    }
 
-    const TIMES = 4;
     const p = new Promise((resolve) => {
+      const TIMES = 4;
       for (let i = 1; i <= TIMES; i++) {
         setTimeout(() => {
-          resolve(i);
+          resolve();
+
           if (i === TIMES) {
-            test_end();
+            expect(success).toHaveBeenCalledTimes(1);
             done();
           }
         }, i * 1000);
@@ -26,7 +24,11 @@ describe('Once resolved, promises will be immutable.', () => {
     p.then(success);
   });
 
-  test('either resolves or rejects', done => {
+});
+
+describe('Either resolves or rejects', () => {
+
+  test('Resolve first', done => {
     const success = jest.fn();
     const failed = jest.fn();
 
@@ -42,4 +44,19 @@ describe('Once resolved, promises will be immutable.', () => {
     });
   });
 
+  test('Reject first', done => {
+    const success = jest.fn();
+    const failed = jest.fn();
+
+    const p = new Promise((resolve, reject) => {
+      reject('failed');
+      resolve('success');
+      done();
+    });
+
+    p.then(success, failed).then(() => {
+      expect(success).not.toHaveBeenCalled();
+      expect(failed).toHaveBeenCalled();
+    });
+  });
 });

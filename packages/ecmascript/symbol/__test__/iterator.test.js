@@ -23,16 +23,18 @@ describe('Iterator Object', () => {
 
 describe('Iterator is Lazy', () => {
 
-  test('Lazy', async (done) => {
+  test('Lazy', done => {
     jest.setTimeout(30000);
 
-    let count = 0;
-    function run(i) {
+    let i = 0;
+    const list = Array(5).fill(0).map((_, index) => index + 1);
+    function run(n) {
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
-          expect(count).toBe(i);
-          if (i === 6) {
+
+          expect(i).toBe(n);
+          if (i === list.length) {
             done();
           }
         }, 500);
@@ -41,9 +43,8 @@ describe('Iterator is Lazy', () => {
 
     function iterate(array) {
       return {
-        [Symbol.iterator]: function* (i = 0) {
+        [Symbol.iterator]: function* () {
           while (i < array.length) {
-            count++;
             yield array[i++];
           }
         }
@@ -51,13 +52,13 @@ describe('Iterator is Lazy', () => {
     }
 
     async function test() {
-      const list = [1, 2, 3, 4, 5, 6];
-      for (let i of iterate(list)) {
-        await run(i);
+      for (let n of iterate(list)) {
+        await run(n);
       }
     }
 
-    await test();
+    test();
+    expect(i).not.toBe(list.length);
   });
 
 });
