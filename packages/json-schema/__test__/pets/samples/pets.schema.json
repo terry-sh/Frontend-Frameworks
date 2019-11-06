@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "pets": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "$ref": "#cat" }, { "$ref": "#dog" }, { "$ref": "#duck" }]
+      }
+    }
+  },
+  "definitions": {
+    "cat": {
+      "$id": "#cat",
+      "properties": {
+        "name": { "type": "string" },
+        "meow": {
+          "type": "string",
+          "description": "The cat's social language"
+        }
+      },
+      "required": ["name", "meow"]
+    },
+    "dog": {
+      "$id": "#dog",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "bark": {
+          "type": "string",
+          "description": "The dog's social language"
+        },
+        "favorites": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["name", "bark"]
+    },
+    "duck": {
+      "$id": "#duck",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "quack": {
+          "type": "string",
+          "description": "The duck's social language"
+        }
+      },
+      "required": ["name", "quack"]
+    }
+  },
+  "required": ["pets"]
+}
