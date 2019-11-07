@@ -1,9 +1,0 @@
-{
-  "pets": [
-    {
-      "name": "Figchok",
-      "bark": "Hi, Yali",
-      "favorites": ["candy", "meat"]
-    }
-  ]
-}

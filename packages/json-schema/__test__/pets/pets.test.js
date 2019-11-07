@@ -6,7 +6,7 @@ describe("pets schema", () => {
   const validate = ajv.compile(schema);
   
   test("test pets-01.json", () => {
-    const file01 = require("./samples/pets-01.json");
+    const file01 = require("./samples/01.pets.json");
     const valid = validate(file01);
     expect(!!valid).toBe(true);
   });

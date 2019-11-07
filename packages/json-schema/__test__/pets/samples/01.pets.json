@@ -1,0 +1,28 @@
+{
+  "pets": [
+    {
+      "type": "dog",
+      "name": "Figchok",
+      "bark": "Hi, Yali",
+      "favorites": ["meat"]
+    },
+    {
+      "type": "dog",
+      "name": "Guaiguai",
+      "bark": "Hi, Figchok",
+      "favorites": ["candy"]
+    },
+    {
+      "type": "cat",
+      "name": "Tom",
+      "meow": "Hi, Jerry",
+      "favorites": ["cheese"]
+    },
+    {
+      "type": "mouse",
+      "name": "Jerry",
+      "squeak": "Hi, Tom",
+      "favorites": ["cheese"]
+    }
+  ]
+}

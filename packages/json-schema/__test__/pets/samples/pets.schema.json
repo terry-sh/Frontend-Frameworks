@@ -5,53 +5,91 @@
     "pets": {
       "type": "array",
       "items": {
-        "oneOf": [{ "$ref": "#cat" }, { "$ref": "#dog" }, { "$ref": "#duck" }]
+        "oneOf": [
+          { "$ref": "#/definitions/cat" },
+          { "$ref": "#/definitions/dog" },
+          { "$ref": "#/definitions/mouse" },
+          { "$ref": "#/definitions/duck" }
+        ]
       }
     }
   },
   "definitions": {
-    "cat": {
-      "$id": "#cat",
+    "pet": {
+      "$id": "#pet",
       "properties": {
         "name": { "type": "string" },
-        "meow": {
-          "type": "string",
-          "description": "The cat's social language"
+        "age": { "type": "number", "maximum": 100, "minimum": 0 },
+        "favorites": {
+          "type": "array",
+          "items": { "type": "string" }
         }
       },
-      "required": ["name", "meow"]
+      "required": ["name"]
+    },
+    "cat": {
+      "$id": "#cat",
+      "allOf": [
+        { "$ref": "#/definitions/pet" },
+        {
+          "properties": {
+            "type": { "const": "cat" },
+            "meow": {
+              "type": "string",
+              "description": "The cat's social language"
+            }
+          },
+          "required": ["type", "meow"]
+        }
+      ]
     },
     "dog": {
       "$id": "#dog",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "bark": {
-          "type": "string",
-          "description": "The dog's social language"
-        },
-        "favorites": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+      "allOf": [
+        { "$ref": "#/definitions/pet" },
+        {
+          "properties": {
+            "type": { "const": "dog" },
+            "bark": {
+              "type": "string",
+              "description": "The dog's social language"
+            }
+          },
+          "required": ["type", "bark"]
         }
-      },
-      "required": ["name", "bark"]
+      ]
     },
     "duck": {
       "$id": "#duck",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "quack": {
-          "type": "string",
-          "description": "The duck's social language"
+      "allOf": [
+        { "$ref": "#/definitions/pet" },
+        {
+          "properties": {
+            "type": { "const": "duck" },
+            "quack": {
+              "type": "string",
+              "description": "The duck's social language"
+            }
+          },
+          "required": ["type", "quack"]
         }
-      },
-      "required": ["name", "quack"]
+      ]
+    },
+    "mouse": {
+      "$id": "#mouse",
+      "allOf": [
+        { "$ref": "#/definitions/pet" },
+        {
+          "properties": {
+            "type": { "const": "mouse" },
+            "squeak": {
+              "type": "string",
+              "description": "The mouse's social language"
+            }
+          },
+          "required": ["type", "squeak"]
+        }
+      ]
     }
   },
   "required": ["pets"]
