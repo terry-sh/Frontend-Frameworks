@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p>
+      fib(<input id="fib-input" type="number" />) =
+      <span id="fib-output"></span>
+    </p>
+    <p>
+      <button id="fib-action-wasm">fib-wasm</button>
+      <button id="fib-action-js">fib-js</button>
+    </p>
+
+    <script>
+      const ImportOptions = {
+        env: {
+          memoryBase: 0,
+          memory: new WebAssembly.Memory({
+            initial: 256
+          }),
+          tableBase: 0,
+          table: new WebAssembly.Table({
+            initial: 0,
+            element: "anyfunc"
+          }),
+          abort: () => null
+        },
+        imports: {
+          fib: arg => {
+            console.log(arg);
+          }
+        }
+      };
+
+      const LoadStatus = {
+        unload: 0,
+        loading: 1,
+        success: 2,
+        failed: -1
+      };
+      class LibPort {
+        constructor(moduleName) {
+          this.moduleName = moduleName;
+          this.status = LoadStatus.unload;
+          this.loadPromise = null;
+          this.exports = {};
+          this.load();
+        }
+
+        load() {
+          if (this.status === LoadStatus.loading) {
+            return this.loadPromise;
+          }
+          this.loadPromise = new Promise((resolve, reject) => {
+            this.status = LoadStatus.loading;
+            const loader = WebAssembly.instantiateStreaming(
+              fetch(this.moduleName),
+              ImportOptions
+            );
+
+            loader
+              .then(result => {
+                this.exports = result.instance.exports;
+                this.status = LoadStatus.success;
+                resolve(this.exports);
+              })
+              .catch(error => {
+                console.log(error);
+                reject(error);
+                this.status = LoadStatus.failed;
+              });
+          });
+          return this.loadPromise;
+        }
+
+        call(method) {
+          const loader =
+            this.status !== LoadStatus.success ? this.load() : this.loadPromise;
+          return loader.then(exports => {
+            return exports[method];
+          });
+        }
+
+        callSync(method) {
+          if (!!this.inited) {
+            const fn = this.exports[method];
+            if (typeof fn === "function") {
+              return fn;
+            }
+          } else {
+            this.load();
+          }
+          return function() {};
+        }
+      }
+    </script>
+
+    <script>
+      function fibjs(n) {
+        let a = 0,
+          b = 1;
+        for (let i = 0; i < n; i++) {
+          let t = a + b;
+          a = b;
+          b = t;
+        }
+        return b;
+      }
+      const lib = new LibPort("./fib.wasm");
+      lib.call("fib").then(fib => {
+        console.log(fib(3));
+      });
+
+      const input = document.getElementById("fib-input");
+      const actionWasm = document.getElementById("fib-action-wasm");
+      const actionJs = document.getElementById("fib-action-js");
+      const output = document.getElementById("fib-output");
+
+      actionWasm.addEventListener("click", event => {
+        const value = parseInt(input.value);
+        const res = lib.exports.fib(value);
+        output.innerText = res;
+      });
+      actionJs.addEventListener("click", event => {
+        const value = parseInt(input.value);
+        const res = fibjs(value);
+        output.innerText = res;
+      });
+    </script>
+  </body>
+</html>

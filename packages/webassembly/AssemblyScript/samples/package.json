@@ -1,0 +1,18 @@
+{
+  "name": "hello",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@assemblyscript/loader": "^0.8.1"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.7.0"
+  },
+  "scripts": {
+    "build": "asc ./fib/fib.as.ts -b ./fib/fib.wasm -O3",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Huang Jules",
+  "license": "ISC"
+}
