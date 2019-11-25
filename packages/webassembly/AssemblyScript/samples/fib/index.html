@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>Fibonacci</title>
   </head>
   <body>
     <p>
@@ -17,26 +17,6 @@
     </p>
 
     <script>
-      const ImportOptions = {
-        env: {
-          memoryBase: 0,
-          memory: new WebAssembly.Memory({
-            initial: 256
-          }),
-          tableBase: 0,
-          table: new WebAssembly.Table({
-            initial: 0,
-            element: "anyfunc"
-          }),
-          abort: () => null
-        },
-        imports: {
-          fib: arg => {
-            console.log(arg);
-          }
-        }
-      };
-
       const LoadStatus = {
         unload: 0,
         loading: 1,
@@ -47,6 +27,21 @@
         constructor(moduleName) {
           this.moduleName = moduleName;
           this.status = LoadStatus.unload;
+
+          this.table = new WebAssembly.Table({
+            initial: 0,
+            element: "anyfunc"
+          });
+          this.memory = new WebAssembly.Memory({
+            initial: 256
+          });
+          this.importOptions = {
+            env: {
+              memory: this.memory,
+              table: this.table,
+              abort: () => null
+            }
+          };
           this.loadPromise = null;
           this.exports = {};
           this.load();
@@ -60,7 +55,7 @@
             this.status = LoadStatus.loading;
             const loader = WebAssembly.instantiateStreaming(
               fetch(this.moduleName),
-              ImportOptions
+              this.importOptions
             );
 
             loader
@@ -117,20 +112,22 @@
       });
 
       const input = document.getElementById("fib-input");
+      const output = document.getElementById("fib-output");
       const actionWasm = document.getElementById("fib-action-wasm");
       const actionJs = document.getElementById("fib-action-js");
-      const output = document.getElementById("fib-output");
 
       actionWasm.addEventListener("click", event => {
-        const value = parseInt(input.value);
-        const res = lib.exports.fib(value);
-        output.innerText = res;
+        updateOutput(lib.exports.fib);
       });
       actionJs.addEventListener("click", event => {
-        const value = parseInt(input.value);
-        const res = fibjs(value);
-        output.innerText = res;
+        updateOutput(fibjs);
       });
+
+      function updateOutput(fn) {
+        const value = parseInt(input.value);
+        const res = fn(value);
+        output.innerText = res;
+      }
     </script>
   </body>
 </html>
