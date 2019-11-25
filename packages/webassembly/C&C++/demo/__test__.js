@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const fs = require("fs");
-
 async function load(mod) {
   try {
     const bytes = fs.readFileSync(mod);
@@ -15,19 +14,10 @@ async function load(mod) {
 
 (async () => {
   const instance = await load("./fib.wasm");
-  const fib_js = require("./__fib").fib_js;
   const times = 100;
 
-  console.time("js:fib");
-  for (let i = 0; i < times; i++) {
-    fib_js(1000);
+  const fibonacci = instance.exports.fib;
+  for (let i = 0; i < 10; i++) {
+    console.log("fib(" + i + ") = ", fibonacci(i));
   }
-  console.timeEnd("js:fib");
-
-  console.time("wasm:fib");
-  const fib_wasm = instance.exports.fib;
-  for (let i = 0; i < times; i++) {
-    fib_wasm(1000);
-  }
-  console.timeEnd("wasm:fib");
 })();

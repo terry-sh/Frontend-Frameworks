@@ -1,6 +1,17 @@
+# C/C++ for WebAssembly
+
+## Emscripten
+
+### `emcc`
+
+- compiles `.wasm` only
+
+  ```bash
+  emcc -O3 demo.c -o demo.wasm
+  ```
 
 ## References
 
+- [Emscripten docs](https://emscripten.org/docs/getting_started/index.html)
 - [Official Guide](https://webassembly.org/docs/c-and-c++/)
 - [Github/Binaryen](https://github.com/WebAssembly/binaryen)
-- [Emscripten docs](https://emscripten.org/docs/getting_started/index.html)
