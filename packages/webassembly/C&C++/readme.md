@@ -2,12 +2,18 @@
 
 ## Emscripten
 
-### `emcc`
+### `emcc`, `em++`
 
 - compiles `.wasm` only
 
   ```bash
   emcc -O3 demo.c -o demo.wasm
+  ```
+
+- compiles `.wasm` and `.js` binding for C++
+
+  ```bash
+  em++ --bind -o demo.bridge.js demo.cpp
   ```
 
 ## References

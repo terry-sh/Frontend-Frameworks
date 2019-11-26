@@ -1,2 +1,5 @@
 *.asm
 *.wasm
+*.bridge.js
+*.wat
+!WAT/**.wat
