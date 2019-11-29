@@ -2,4 +2,6 @@
 *.wasm
 *.bridge.js
 *.wat
-!WAT/**.wat
+!WAT/**/*.wat
+WAT/**/*.debug.wat
+Architecture/*.svg

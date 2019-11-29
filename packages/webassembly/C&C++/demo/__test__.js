@@ -14,10 +14,15 @@ async function load(mod) {
 
 (async () => {
   const instance = await load("./fib.wasm");
-  const times = 100;
 
   const fibonacci = instance.exports.fib;
   for (let i = 0; i < 10; i++) {
     console.log("fib(" + i + ") = ", fibonacci(i));
   }
+})();
+
+(async () => {
+  const instance = await load("./string.wasm");
+  const name = instance.exports.name;
+  console.log("name =", instance.exports)
 })();
