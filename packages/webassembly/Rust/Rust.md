@@ -10,3 +10,8 @@ Guide:
   * `wasm-pack`
   * cargo-generate
   * npm
+
+## Wasm-based Frameworks
+
+- [Yew](https://github.com/yewstack/yew)
+- [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen)

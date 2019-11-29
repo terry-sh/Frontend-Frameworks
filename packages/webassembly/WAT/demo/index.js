@@ -14,7 +14,7 @@ function load(mod) {
     // imported methods
     console: {
       log: arg => {
-        console.log("Call log from WASM: %c" + arg, "color: violet; background-color: #fff;");
+        console.log("Call JavaScript console.log from Wasm: %c" + arg, "color: violet; background-color: #fff;");
       }
     }
   });
