@@ -1,0 +1,45 @@
+
+digraph Architecture {
+  rankdir=LR;
+
+  node[shape=plaintext];
+
+  source_code[label="源代码"];
+
+  subgraph cluster_frontend {
+    label="编译器前端";
+    precompile[label="预编译"];
+    lexical_analysis[label="词法分析"];
+    grammar_analysis[label="语法分析"];
+    segmantic_analysis[label="语义分析"];
+    ast[label="抽象语法树"];
+    
+    source_code -> 
+    precompile -> 
+    lexical_analysis ->
+    grammar_analysis -> 
+    segmantic_analysis -> 
+    ast;
+  }
+
+  intermediate[label="中间代码"];
+  target[label="目标代码"];
+  ast -> intermediate -> target;
+
+  webassembly[label="WebAssembly"; fontcolor=blue];
+
+  subgraph wasm {
+    wasm_source_code[label="C/C++/Rust..."];
+    native[label="本地执行"];
+  
+    wasm_compiler[label="编译器"];
+
+    wasm_source_code -> wasm_compiler -> webassembly;
+    webassembly -> native[label="virtual machine"];
+  }
+
+  webassembly -> intermediate[dir=none, style=dotted];
+
+  { rank = same; webassembly; intermediate };
+  { rank = same; wasm_source_code; source_code };
+}

@@ -1,0 +1,41 @@
+digraph WABT {
+  node[shape=circle];
+  wat[label="WAT"];
+  wasm[label="WASM"];
+  c[label="C/C++"];
+  json[label="JSON"];
+
+  node[shape=plaintext; target="__blank"];
+  wasm2wat[label="wasm2wat"; href="https://webassembly.github.io/wabt/doc/wasm2wat.1.html"];
+  wat2wasm[label="wat2wasm"; href="https://webassembly.github.io/wabt/doc/wat2wasm.1.html"];
+  { rank = same; wat2wasm; wasm2wat; }
+  objdump[label="wasm-objdump"];
+  wasm_interp[label="wasm-interp"];
+  desugar[label="wat-desugar"];
+  strip[label="wasm-strip"];
+  validate[label="wasm-validate"];
+  wast2json;
+  opcode[label="wasm-opcodecnt"];
+  spectest[label="spectest-interp"];
+
+  { rank = same; c; wasm2c; wasm; wasm_interp }
+  { rank = same; wat; desugar; json; spectest }
+
+  edge[color=green];
+  wat -> wat2wasm -> wasm;
+  edge[color=blue];
+  wasm -> wasm2wat -> wat;
+  edge[color=purple];
+  wasm -> wasm2c -> c;
+
+  edge[color=black];
+  wasm -> { opcode, strip, validate, objdump };
+  json -> spectest;
+
+  edge[dir=back];
+  wasm_interp -> wasm;
+  desugar -> wat;
+
+  edge[color=violet];
+  json -> wast2json -> wasm;
+}
