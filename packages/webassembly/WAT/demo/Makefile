@@ -19,6 +19,9 @@ bridge.wasm: bridge.wat
 exports.wasm: exports.wat
 	$(encode) exports.wat -o exports.wasm
 
+memory.wasm: memory.wat
+	$(encode) memory.wat -o memory.wasm
+
 add.debug: add.wasm
 	$(decode) add.wasm -o add.debug.wat
 
