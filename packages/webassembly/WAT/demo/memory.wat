@@ -1,5 +1,8 @@
 (module 
   (memory (export "mem") 1)
+  ;; only one memory block allowed
+  ;; (memory (export "mem2") 16)
+
   ;; load and store at nth byte (pointer offset unit: 8bit)
   (func (export "get_memory") (param $ptr i32) (result i32)
     (i32.load (local.get $ptr))

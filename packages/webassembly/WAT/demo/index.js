@@ -16,8 +16,12 @@ function load(mod) {
       log: arg => {
         console.log("Call JavaScript console.log from Wasm: %c" + arg, "color: violet; background-color: #fff;");
       }
+    },
+    math: {
+      add: (a, b) => a + b,
     }
   });
+
   return new Promise((resolve, reject) => {
     loader
       .then(result => {
